@@ -52,7 +52,9 @@ struct ContentView: View {
     }
     
     func loadData(search: String) {
-        guard let url = URL(string: "https://itunes.apple.com/search?term=\(search)&entity=song") else {
+        // fix strings with spaces, weird chars
+        let fixedSearch = search.replacingOccurrences(of: " ", with: "+")
+        guard let url = URL(string: "https://itunes.apple.com/search?term=\(fixedSearch)&entity=song") else {
             print("Invalid URL")
             return
         }
