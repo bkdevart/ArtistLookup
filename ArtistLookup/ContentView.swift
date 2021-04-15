@@ -33,7 +33,7 @@ struct ContentView: View {
             
             Section {
                 Button("Search albums") {
-                    loadData()
+                    loadData(search: artist)
                     print("Searching albums...")
                 }
             }
@@ -51,8 +51,8 @@ struct ContentView: View {
         }
     }
     
-    func loadData() {
-        guard let url = URL(string: "https://itunes.apple.com/search?term=taylor+swift&entity=song") else {
+    func loadData(search: String) {
+        guard let url = URL(string: "https://itunes.apple.com/search?term=\(search)&entity=song") else {
             print("Invalid URL")
             return
         }
