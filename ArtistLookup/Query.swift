@@ -10,9 +10,9 @@ import Foundation
 class Query: ObservableObject {
     static let keys = ["term", "country", "media", "entity", "attribute", "callback",
                       "limit", "lang", "version", "explicit"]
-    static let entities = ["movie", "podcast", "music", "musicVideo", "audiobook",
-                         "shortFilm", "tvShow", "software", "ebook", "all"]
-    static let attributes = ["movie", "podcast", "music", "musicVideo", "audiobook",
-                             "shortFilm", "software", "tvShow", "all"]
+    static let media = ["all", "movie", "podcast", "music", "musicVideo", "audiobook",
+                         "shortFilm", "tvShow", "software", "ebook"]
+
     @Published var key = 0
+    @Published var media = 0
 }
