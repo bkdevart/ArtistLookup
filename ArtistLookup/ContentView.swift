@@ -18,43 +18,49 @@ struct Result: Codable {
 }
 
 struct ContentView: View {
-    @State var artist = ""
+    @State var value = ""
+    @State var key = ""
     @State var results = [Result]()
-    
-    var disableForm: Bool {
-        artist.count < 5
-    }
+    @ObservedObject var query = Query()
     
     var body: some View {
-        Form {
-            Section {
-                TextField("Artist", text: $artist)
-            }
-            
-            Section {
-                Button("Search albums") {
-                    loadData(search: artist)
-                    print("Searching albums...")
+        NavigationView {
+            Form {
+                Section {
+                    Picker("Select key", selection: $query.key) {
+                        ForEach(0..<Query.keys.count) {
+                            Text(Query.keys[$0])
+                        }
+                    }
+                    TextField("\(Query.keys[self.query.key]) value", text: $value)
                 }
-            }
-//            .disabled(disableForm)
-            .disabled(artist.isEmpty)
-            
-            List(results, id: \.trackId) { item in
-                VStack(alignment: .leading) {
-                    Text(item.trackName)
-                        .font(.headline)
-                    
-                    Text(item.collectionName)
+                
+                Section {
+                    Button("Search albums") {
+                        loadData(key: Query.keys[self.query.key], value: value)
+                        print("Searching albums...")
+                    }
+                }
+                .disabled(value.isEmpty)
+                
+                List(results, id: \.trackId) { item in
+                    VStack(alignment: .leading) {
+                        Text(item.trackName)
+                            .font(.headline)
+                        
+                        Text(item.collectionName)
+                    }
                 }
             }
         }
     }
     
-    func loadData(search: String) {
+    func loadData(key: String, value: String) {
         // fix strings with spaces, weird chars
-        let fixedSearch = search.replacingOccurrences(of: " ", with: "+")
-        guard let url = URL(string: "https://itunes.apple.com/search?term=\(fixedSearch)&entity=song") else {
+        let fixedValue = value.replacingOccurrences(of: " ", with: "+")
+        // https://itunes.apple.com/search?term=jack+johnson&entity=musicVideo
+        // https://itunes.apple.com/search?term=jack+johnson&limit=25
+        guard let url = URL(string: "https://itunes.apple.com/search?\(key)=\(fixedValue)&entity=song&limit=25") else {
             print("Invalid URL")
             return
         }
