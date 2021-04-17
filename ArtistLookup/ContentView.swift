@@ -26,37 +26,43 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section {
-                    Picker("Select media", selection: $query.media) {
-                        ForEach(0..<Query.media.count) {
-                            Text(Query.media[$0])
+            VStack {
+                Image("\(Query.media[self.query.media])")
+                    .resizable()
+                    .scaledToFit()
+                Form {
+                    Section {
+                        Picker("Select media", selection: $query.media) {
+                            ForEach(0..<Query.media.count) {
+                                Text(Query.media[$0])
+                            }
+                        }
+                        Picker("Select key", selection: $query.key) {
+                            ForEach(0..<Query.keys.count) {
+                                Text(Query.keys[$0])
+                            }
+                        }
+                        TextField("\(Query.keys[self.query.key]) value", text: $value)
+                    }
+                    
+                    Section {
+                        Button("Search \(Query.media[self.query.media])") {
+                            loadData(media: Query.media[self.query.media],
+                                     key: Query.keys[self.query.key],
+                                     value: value)
+                            print("Searching \(Query.media[self.query.media])...")
                         }
                     }
-                    Picker("Select key", selection: $query.key) {
-                        ForEach(0..<Query.keys.count) {
-                            Text(Query.keys[$0])
+                    .disabled(value.isEmpty)
+                    
+                    List(results, id: \.trackId) { item in
+                        VStack(alignment: .leading) {
+                            Text(item.trackName)
+                                .font(.headline)
+                            
+                            Text(item.collectionName)
                         }
-                    }
-                    TextField("\(Query.keys[self.query.key]) value", text: $value)
-                }
-                
-                Section {
-                    Button("Search \(Query.media[self.query.media])") {
-                        loadData(media: Query.media[self.query.media],
-                                 key: Query.keys[self.query.key],
-                                 value: value)
-                        print("Searching \(Query.media[self.query.media])...")
-                    }
-                }
-                .disabled(value.isEmpty)
-                
-                List(results, id: \.trackId) { item in
-                    VStack(alignment: .leading) {
-                        Text(item.trackName)
-                            .font(.headline)
                         
-                        Text(item.collectionName)
                     }
                 }
             }
@@ -81,11 +87,12 @@ struct ContentView: View {
                     DispatchQueue.main.async {
                         self.results = decodedResponse.results
                     }
-                    
+                    print("\(media) results returned")
                     return
                 }
             }
             print("Fetch failed: \(error?.localizedDescription ?? "Unknown error")")
+            print(request)
         }.resume()
     }
 }
